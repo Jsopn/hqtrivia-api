@@ -66,6 +66,11 @@ class HQTrivia extends EventEmitter {
     return acceptFriendRes.data.status === 'ACCEPTED'
   }
 
+  async getUpcomingSchedule() {
+    const leaderboard = await this.axios.get('/shows/schedule')
+    return leaderboard.data.shows
+  }
+
   async addFriend (userId) {
     const addFriendRes = await this.axios.post(`/friends/${userId}/requests`)
     return addFriendRes.data.status === 'PENDING'

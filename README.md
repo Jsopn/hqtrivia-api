@@ -15,6 +15,7 @@ This is a Node.JS wrapper for HQ Trivia
 - `hq.addFriend(userId)` - Add friend
 - `hq.getIncomingFriendRequests()` - Get incoming friend requests
 - `hq.connectToGame()` - Connect to game
+- `hq.getUpcomingSchedule()` - Get upcoming games schedule
 
 ## Trivia Game Methods
 - `hq.sendAnswer(answerID, questionId)` - Send answer to HQ
