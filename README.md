@@ -41,7 +41,7 @@ This is a Node.JS wrapper for HQ Trivia
 
 ## Trivia Example 1
 ```js
-const HQTrvia = require('hqtrivia-api')
+const HQTrivia = require('hqtrivia-api')
 const hq = new HQTrivia('[token]')
 
 hq.connectToGame()
@@ -65,7 +65,7 @@ hq.on('disconnected', (code) => {
 
 ## Words Example 1
 ```js
-const HQTrvia = require('hqtrivia-api')
+const HQTrivia = require('hqtrivia-api')
 const hq = new HQTrivia('[token]')
 
 hq.connectToGame()
