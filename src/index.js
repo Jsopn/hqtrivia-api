@@ -66,7 +66,7 @@ class HQTrivia extends EventEmitter {
     return acceptFriendRes.data.status === 'ACCEPTED'
   }
 
-  async getUpcomingSchedule() {
+  async getUpcomingSchedule () {
     const leaderboard = await this.axios.get('/shows/schedule')
     return leaderboard.data.shows
   }
