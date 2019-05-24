@@ -3,10 +3,11 @@ const { EventEmitter } = require('events')
 const WebSocket = require('ws')
 
 class HQTrivia extends EventEmitter {
-  constructor (token, apiURL = 'https://api-quiz.hype.space') {
+  constructor (token, testSocket = false, apiURL = 'https://api-quiz.hype.space') {
     super(token, apiURL)
     if (!token) throw new Error('No authentication token was provided.')
     this.token = token
+    this.testSocket = testSocket
     this.headers = {
       'x-hq-device': 'iPhone7,2',
       'x-hq-client': 'iOS/1.3.7 b90',
@@ -85,17 +86,17 @@ class HQTrivia extends EventEmitter {
     return friends
   }
 
-  // sendAnswer (answerID, questionId) {
-  //   if (!this.WSConn || this.WSConn.readyState !== WebSocket.OPEN) throw new Error('You are not connected to the game')
-  //   if (this.gameType !== 'trivia') throw new Error('You can not send a letter because this game is not Trivia')
-  //   this.WSConn.send(JSON.stringify({
-  //     questionId: parseInt(questionId),
-  //     type: 'answer',
-  //     answerId: parseInt(answerID)
-  //   }))
-  // }
-
   sendAnswer (answerID, questionId) {
+    if (!this.WSConn || this.WSConn.readyState !== WebSocket.OPEN) throw new Error('You are not connected to the game')
+    if (this.gameType !== 'trivia') throw new Error('You can not send a letter because this game is not Trivia')
+    this.WSConn.send(JSON.stringify({
+      questionId: parseInt(questionId),
+      type: 'answer',
+      answerId: parseInt(answerID)
+    }))
+  }
+
+  sendSurveyAnswer (answerID, questionId) {
     if (!this.WSConn || this.WSConn.readyState !== WebSocket.OPEN) throw new Error('You are not connected to the game')
     if (this.gameType !== 'trivia') throw new Error('You can not send a letter because this game is not Trivia')
     this.WSConn.send(JSON.stringify({
@@ -175,8 +176,19 @@ class HQTrivia extends EventEmitter {
   }
 
   async connectToGame () {
-    const shows = await this.getShows()
-    if (!shows.active) throw new Error('Game is not active')
+    var shows = {}
+    if (!this.testSocket) {
+      shows = await this.getShows()
+      if (!shows.active) throw new Error('Game is not active')
+    } else {
+      shows = {
+        nextShowVertical: 'general',
+        broadcast: {
+          broadcastId: 1488,
+          socketUrl: 'wss://hqecho.herokuapp.com/'
+        }
+      }
+    }
 
     this.WSConn = new WebSocket(shows.broadcast.socketUrl, {
       headers: this.headers
@@ -207,6 +219,7 @@ class HQTrivia extends EventEmitter {
     this.WSConn.on('message', (rawData) => {
       try {
         const data = JSON.parse(rawData)
+        this.emit('message', data)
         this.emit(data.type, {
           ...data,
           lastQuestion: this.lastQuestion

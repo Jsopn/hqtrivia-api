@@ -20,6 +20,7 @@ This is a Node.JS wrapper for HQ Trivia
 
 ## Trivia Game Methods
 - `hq.sendAnswer(answerID, questionId)` - Send answer to HQ
+- `hq.sendSurveyAnswer(answerID, questionId)` - Send survey answer to HQ
 - `hq.useExtralive(questionId)` - Use extra live
 - `hq.sendEraser(questionId)` - Use eraser
 - `hq.getErasers(friendIds)` - Get erasers
