@@ -3,15 +3,14 @@ const { EventEmitter } = require('events')
 const WebSocket = require('ws')
 
 class HQTrivia extends EventEmitter {
-  constructor (token, testSocket = false, apiURL = 'https://api-quiz.hype.space') {
-    super(token, apiURL)
-    if (!token) throw new Error('No authentication token was provided.')
+  constructor (token = '', testSocket = false, apiURL = 'https://api-quiz.hype.space') {
+    super()
     this.token = token
     this.testSocket = testSocket
     this.headers = {
       'x-hq-device': 'iPhone7,2',
       'x-hq-client': 'iOS/1.3.7 b90',
-      'authorization': `Bearer ${token}`
+      ...this.token ? { 'authorization': `Bearer ${token}` } : {}
     }
     this.axios = axios.create({
       baseURL: apiURL,
@@ -20,7 +19,75 @@ class HQTrivia extends EventEmitter {
     this.lastQuestion = {}
   }
 
+  setToken (token) {
+    this.headers = {
+      'x-hq-device': 'iPhone7,2',
+      'x-hq-client': 'iOS/1.3.7 b90',
+      'authorization': `Bearer ${token}`
+    }
+    this.token = token
+  }
+
+  async sendCode (phone, method = 'sms') {
+    const sendCodeRes = await this.axios.post('/verifications', {
+      phone: phone,
+      method: method
+    })
+
+    this.verificationId = sendCodeRes.data.verificationId
+    return {
+      success: !!sendCodeRes.data.verificationId,
+      verificationId: sendCodeRes.data.verificationId
+    }
+  }
+
+  async confirmCode (code, verificationId = this.verificationId) {
+    const confirmCodeRes = await this.axios.post(`verifications/${verificationId}`, {
+      code: code
+    })
+
+    if (!confirmCodeRes.data.auth === null) {
+      return {
+        success: true,
+        accountRegistred: false
+      }
+    } else if (confirmCodeRes.data.accessToken) {
+      return {
+        success: true,
+        accountRegistred: true,
+        token: confirmCodeRes.data.accessToken
+      }
+    } else {
+      throw new Error('Unknown API error')
+    }
+  }
+
+  async register (username, referral = null, verificationId = this.verificationId) {
+    const registerRes = await this.axios.post('/users', {
+      country: 'MQ==',
+      language: 'us',
+      referringUsername: referral,
+      username: username,
+      verificationId: verificationId
+    })
+
+    switch (registerRes.data.errorCode) {
+      case 101:
+        throw new Error('Username already registred')
+
+      case 471:
+        throw new Error('Username too long')
+    }
+
+    if (registerRes.data.accessToken) {
+      return registerRes.data.accessToken
+    } else {
+      throw new Error('Unknown API Error')
+    }
+  }
+
   async getUserData () {
+    if (!this.token) throw new Error('This method cannot be used without authorization')
     const userDataRes = await this.axios.get('/users/me')
     if (userDataRes.data.error) throw new Error(userDataRes.data.error)
     return userDataRes.data
@@ -32,16 +99,19 @@ class HQTrivia extends EventEmitter {
   }
 
   async getLeaderboard () {
+    if (!this.token) throw new Error('This method cannot be used without authorization')
     const leaderboard = await this.axios.get('/users/leaderboard')
     return leaderboard.data
   }
 
   async getUserById (id) {
+    if (!this.token) throw new Error('This method cannot be used without authorization')
     const userInfo = await this.axios.get(`/users/${id}`)
     return userInfo.data
   }
 
   async searchUsers (query) {
+    if (!this.token) throw new Error('This method cannot be used without authorization')
     const searchUserRes = await this.axios.get(`/users?q=${encodeURIComponent(query)}`)
     const users = await Promise.all(searchUserRes.data.data.map(async userInfo => {
       const userRes = await this.getUserById(userInfo.userId)
@@ -52,6 +122,7 @@ class HQTrivia extends EventEmitter {
   }
 
   async getFriends () {
+    if (!this.token) throw new Error('This method cannot be used without authorization')
     const friendsResp = await this.axios.get('/friends')
     const friends = await Promise.all(friendsResp.data.data.map(async userInfo => {
       const userRes = await this.getUserById(userInfo.userId)
@@ -61,6 +132,7 @@ class HQTrivia extends EventEmitter {
   }
 
   async acceptFriendRequest (userId) {
+    if (!this.token) throw new Error('This method cannot be used without authorization')
     const acceptFriendRes = await this.axios.put(`/friends/${userId}/status`, {
       status: 'ACCEPTED'
     })
@@ -68,16 +140,19 @@ class HQTrivia extends EventEmitter {
   }
 
   async getUpcomingSchedule () {
+    if (!this.token) throw new Error('This method cannot be used without authorization')
     const leaderboard = await this.axios.get('/shows/schedule')
     return leaderboard.data.shows
   }
 
   async addFriend (userId) {
+    if (!this.token) throw new Error('This method cannot be used without authorization')
     const addFriendRes = await this.axios.post(`/friends/${userId}/requests`)
     return addFriendRes.data.status === 'PENDING'
   }
 
   async getIncomingFriendRequests () {
+    if (!this.token) throw new Error('This method cannot be used without authorization')
     const friendsResp = await this.axios.get('/friends/requests/incoming')
     const friends = await Promise.all(friendsResp.data.data.map(async userInfo => {
       const userRes = await this.getUserById(userInfo.userId)
@@ -176,6 +251,7 @@ class HQTrivia extends EventEmitter {
   }
 
   async connectToGame () {
+    if (!this.token) throw new Error('This method cannot be used without authorization')
     var shows = {}
     if (!this.testSocket) {
       shows = await this.getShows()

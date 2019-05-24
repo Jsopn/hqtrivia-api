@@ -17,6 +17,13 @@ This is a Node.JS wrapper for HQ Trivia
 - `hq.connectToGame()` - Connect to the game
 - `hq.disconnectFromGame()` - Disconnect from the game
 - `hq.getUpcomingSchedule()` - Get upcoming games schedule
+- `hq.setToken(token)` - Sets token for requests
+
+## Registration methods
+- `hq.sendCode(phone, [method])` - Sends the code to the specified phone
+- `hq.confirmCode(code, [verificationId])` - Confirm code
+- `hq.register(username, [referral], [verificationId])` - Register an account if it is not registered
+
 
 ## Trivia Game Methods
 - `hq.sendAnswer(answerID, questionId)` - Send answer to HQ
@@ -100,4 +107,20 @@ hq.on('startRound', (data) => {
 hq.on('disconnected', (code) => {
     console.log('Disconnected from HQ WS')
 })
+```
+## Register example
+```js
+const HQTrivia = require('hqtrivia-api')
+const hq = new HQTrivia()
+
+await hq.sendCode('+11111111111')
+const response = await hq.confirmCode('0228')
+if (response.accountRegistred) {
+    console.log(`token: ${response.token}`)
+    hq.setToken(response.token)
+} else {
+    const token = await hq.register('jsoplox', 'machuita')
+    console.log(`token: ${token}`)
+    hq.setToken(token)
+}
 ```
