@@ -14,11 +14,15 @@ This is a Node.JS wrapper for HQ Trivia
 - `hq.acceptFriendRequest(userId)` - Accept friend request
 - `hq.addFriend(userId)` - Add friend
 - `hq.getIncomingFriendRequests()` - Get incoming friend requests
-- `hq.connectToGame()` - Connect to game
+- `hq.connectToGame()` - Connect to the game
+- `hq.disconnectFromGame()` - Disconnect from the game
 
 ## Trivia Game Methods
 - `hq.sendAnswer(answerID, questionId)` - Send answer to HQ
 - `hq.useExtralive(questionId)` - Use extra live
+- `hq.sendEraser(questionId)` - Use eraser
+- `hq.getErasers(friendIds)` - Get erasers
+
 
 ## Words Game Methods
 - `hq.sendLetter(roundId, showId, letter)` - Send letter to HQ
