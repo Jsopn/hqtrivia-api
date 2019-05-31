@@ -47,7 +47,7 @@ class HQTrivia extends EventEmitter {
       code: code
     })
 
-    if (!confirmCodeRes.data.auth === null) {
+    if (confirmCodeRes.data.auth === null) {
       return {
         success: true,
         accountRegistred: false
