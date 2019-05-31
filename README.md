@@ -20,6 +20,7 @@ This is a Node.JS wrapper for HQ Trivia
 - `hq.setToken(token)` - Sets token for requests
 - `hq.changeUsername(username)` - Change username
 - `hq.checkUsername(username)` - Check username
+- `hq.makePayout(email)` - Make payout
 
 ## Registration methods
 - `hq.sendCode(phone, [method])` - Sends the code to the specified phone

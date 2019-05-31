@@ -123,6 +123,14 @@ class HQTrivia extends EventEmitter {
     return payoutsInfo.data
   }
 
+  async makePayout (email) {
+    if (!this.token) throw new Error('This method cannot be used without authorization')
+    const makePayout = await this.axios.post('/users/me/payouts', {
+      email: email
+    })
+    return makePayout.data
+  }
+
   async changeUsername (username) {
     if (!this.token) throw new Error('This method cannot be used without authorization')
     const changeUsernameResp = await this.axios.patch('/users/me', {
