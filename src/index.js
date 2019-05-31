@@ -315,7 +315,6 @@ class HQTrivia extends EventEmitter {
     var pingInterval
 
     this.WSConn.on('open', () => {
-      this.emit('connected')
       pingInterval = setInterval(this.WSConn.ping, 10000)
       this.broadcastId = parseInt(shows.broadcast.broadcastId)
       if (shows.nextShowVertical === 'words') {
@@ -328,6 +327,9 @@ class HQTrivia extends EventEmitter {
       } else {
         this.gameType = 'trivia'
       }
+      this.emit('connected', {
+        gameType: this.gameType
+      })
     })
 
     this.WSConn.on('close', (code) => {
