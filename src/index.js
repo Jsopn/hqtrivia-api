@@ -14,7 +14,8 @@ class HQTrivia extends EventEmitter {
     }
     this.axios = axios.create({
       baseURL: apiURL,
-      headers: this.headers
+      headers: this.headers,
+      validateStatus: false
     })
     this.lastQuestion = {}
   }
@@ -108,6 +109,34 @@ class HQTrivia extends EventEmitter {
     if (!this.token) throw new Error('This method cannot be used without authorization')
     const userInfo = await this.axios.get(`/users/${id}`)
     return userInfo.data
+  }
+
+  async getPayoutsInfo () {
+    if (!this.token) throw new Error('This method cannot be used without authorization')
+    const payoutsInfo = await this.axios.get('/users/me/payouts')
+    return payoutsInfo.data
+  }
+
+  async changeUsername (username) {
+    if (!this.token) throw new Error('This method cannot be used without authorization')
+    const changeUsernameResp = await this.axios.patch('/users/me', {
+      username: username
+    })
+    return changeUsernameResp.data
+  }
+
+  async checkUsername (username) {
+    if (!this.token) throw new Error('This method cannot be used without authorization')
+    const checkUsernameResp = await this.axios.post('/usernames/available', {
+      username: username
+    })
+    return checkUsernameResp.data
+  }
+
+  async easterEgg (type = 'makeItRain') {
+    if (!this.token) throw new Error('This method cannot be used without authorization')
+    const easterEggResp = await this.axios.post(`/easter-eggs/${type}`)
+    return easterEggResp.data
   }
 
   async searchUsers (query) {

@@ -18,6 +18,8 @@ This is a Node.JS wrapper for HQ Trivia
 - `hq.disconnectFromGame()` - Disconnect from the game
 - `hq.getUpcomingSchedule()` - Get upcoming games schedule
 - `hq.setToken(token)` - Sets token for requests
+- `hq.changeUsername(username)` - Change username
+- `hq.checkUsername(username)` - Check username
 
 ## Registration methods
 - `hq.sendCode(phone, [method])` - Sends the code to the specified phone
