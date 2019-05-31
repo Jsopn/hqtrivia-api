@@ -58,6 +58,12 @@ class HQTrivia extends EventEmitter {
         accountRegistred: true,
         token: confirmCodeRes.data.accessToken
       }
+    } else if (confirmCodeRes.data.auth.accessToken) {
+      return {
+        success: true,
+        accountRegistred: true,
+        token: confirmCodeRes.data.auth.accessToken
+      }
     } else {
       throw new Error('Unknown API error')
     }

@@ -1,6 +1,6 @@
 {
 	"name": "hqtrivia-api",
-	"version": "1.8.1",
+	"version": "1.8.2",
 	"description": "HQ Trivia API wrapper for Node.js",
 	"main": "src/index.js",
 	"repository": {
