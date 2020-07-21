@@ -1,3 +1,5 @@
+# THIS LIB IS UNMAINTAINED, DEPRECATED & ABANDONED
+
 # HQ Trivia API
 This is a Node.JS wrapper for HQ Trivia
 
